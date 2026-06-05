@@ -1,4 +1,5 @@
 import { useState } from "react";
+import hero from "./assets/LOGO.JPG";
 
 export default function App() {
   const [phone, setPhone] = useState("");
@@ -39,7 +40,7 @@ export default function App() {
       >
         <div style={{ textAlign: "center" }}>
           <img
-            src="src/assets/Hero.JPG" // เปลี่ยนเป็น path โลโก้ของคุณ
+            src="src/assets/LOGO.JPG" // เปลี่ยนเป็น path โลโก้ของคุณ
             alt="Logo"
             style={{
               width: "120px",
