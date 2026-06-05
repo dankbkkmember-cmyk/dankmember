@@ -40,7 +40,7 @@ export default function App() {
       >
         <div style={{ textAlign: "center" }}>
           <img
-            src="src/assets/LOGO.JPG" // เปลี่ยนเป็น path โลโก้ของคุณ
+            src={hero}
             alt="Logo"
             style={{
               width: "120px",
