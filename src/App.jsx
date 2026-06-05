@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import Papa from "papaparse";
-import hero from "../assets/LOGO.JPG";
+import hero from "./assets/LOGO.JPG";
 
 export default function App() {
   const [phone, setPhone] = useState("");
