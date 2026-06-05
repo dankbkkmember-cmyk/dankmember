@@ -1,20 +1,40 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import Papa from "papaparse";
 import hero from "../assets/LOGO.JPG";
 
 export default function App() {
   const [phone, setPhone] = useState("");
   const [member, setMember] = useState(null);
+  const [members, setMembers] = useState([]);
 
+  // โหลด CSV
+  useEffect(() => {
+    fetch("/dankmember/member.csv")
+      .then((response) => response.text())
+      .then((csvText) => {
+        Papa.parse(csvText, {
+          header: true,
+          skipEmptyLines: true,
+          complete: (result) => {
+            console.log("DATA:", result.data);
+            setMembers(result.data); // ✅ สำคัญมาก
+          },
+        });
+      });
+  }, []);
+
+  // ค้นหาเบอร์
   const handleSearch = () => {
-    // Mock Data (เปลี่ยนเป็น API ทีหลัง)
-    setMember({
-      name: "Kongthornin",
-      level: "GOLD MEMBER",
-      points: 12450,
-      spend: 86500,
-      discount: "5%",
-      lastVisit: "04/06/2026",
-    });
+    const found = members.find(
+      (m) => m["Phone Number"]?.replace(/-/g, "") === phone.replace(/-/g, ""),
+    );
+
+    if (found) {
+      setMember(found);
+    } else {
+      alert("ไม่พบสมาชิก");
+      setMember(null);
+    }
   };
 
   return (
@@ -41,7 +61,7 @@ export default function App() {
         <div style={{ textAlign: "center" }}>
           <img
             src={hero}
-            alt="Logo"
+            alt=""
             style={{
               width: "120px",
               height: "120px",
@@ -49,9 +69,9 @@ export default function App() {
               marginBottom: "10px",
             }}
           />
+
           <h1
             style={{
-              textAlign: "center",
               marginBottom: "30px",
               fontSize: "32px",
               color: "black",
@@ -60,7 +80,7 @@ export default function App() {
             DANK MEMBER
           </h1>
 
-          <label>เบอร์โทรศัพพ์ / Phone Number</label>
+          <label>เบอร์โทรศัพท์ / Phone Number</label>
 
           <input
             type="text"
@@ -97,22 +117,26 @@ export default function App() {
           {member && (
             <div
               style={{
-                marginTop: "30px",
+                marginTop: "40px",
                 borderTop: "1px solid #eee",
                 paddingTop: "20px",
+                tAlign: "center",
               }}
             >
-              <h2>{member.name}</h2>
+              <h2 style={{ color: "black" }}>{member["Crm Name"]}</h2>
 
-              <p>⭐ {member.level}</p>
+              <p style={{ color: "black" }}>📞 {member["Phone Number"]}</p>
 
-              <p>🎁 Points: {member.points.toLocaleString()}</p>
+              <p style={{ color: "black" }}>⭐ {member["Membership Tier"]}</p>
 
-              <p>💰 Spend: {member.spend.toLocaleString()} บาท</p>
+              <p style={{ color: "black" }}>
+                🎁 Points: {Number(member["Points"] || 0).toLocaleString()}
+              </p>
 
-              <p>🏷 Discount: {member.discount}</p>
-
-              <p>📅 Last Visit: {member.lastVisit}</p>
+              <p style={{ color: "black" }}>
+                💰 Spend:{" "}
+                {Number(member["Total Spending"] || 0).toLocaleString()} บาท
+              </p>
 
               <button
                 style={{
