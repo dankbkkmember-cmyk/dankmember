@@ -1,5 +1,5 @@
 import { useState } from "react";
-import hero from "./assets/LOGO.JPG";
+import hero from "../assets/LOGO.JPG";
 
 export default function App() {
   const [phone, setPhone] = useState("");
