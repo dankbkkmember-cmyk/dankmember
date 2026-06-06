@@ -18,6 +18,7 @@ export default function App() {
     birthdate: "",
   });
   const [loading, setLoading] = useState(false);
+  const [searchLoading, setSearchLoading] = useState(false);
 
   const [popup, setPopup] = useState({
     show: false,
@@ -26,38 +27,81 @@ export default function App() {
   });
 
   // โหลด CSV
-  useEffect(() => {
-    fetch(
+  const loadMembers = async () => {
+    const response = await fetch(
       "https://docs.google.com/spreadsheets/d/e/2PACX-1vTwGEAAU2YtXrj9VsS0sLNTeCkAuzSfgYWgyZYjnHWJ7yniymo4_TxIwP1O8P1QHvtYnvlXSuvdE7zP/pub?output=csv",
-    )
-      .then((response) => response.text())
-      .then((csvText) => {
-        Papa.parse(csvText, {
-          header: true,
-          skipEmptyLines: true,
-          complete: (result) => {
-            setMembers(result.data);
-          },
-        });
+    );
+
+    const csvText = await response.text();
+
+    return new Promise((resolve) => {
+      Papa.parse(csvText, {
+        header: true,
+        skipEmptyLines: true,
+        complete: (result) => {
+          setMembers(result.data);
+          resolve(result.data);
+        },
       });
+    });
+  };
+
+  useEffect(() => {
+    loadMembers();
   }, []);
 
   // ค้นหาเบอร์
   const normalizePhone = (p) => (p || "").replace(/\D/g, "").replace(/^0/, "");
 
-  const handleSearch = () => {
-    const inputPhone = normalizePhone(phone);
+  const handleSearch = async () => {
+    try {
+      setSearchLoading(true);
+      setShowRegister(false);
 
-    const found = members.find((m) => {
-      const sheetPhone = normalizePhone(m["Phone Number"]);
-      return sheetPhone === inputPhone;
-    });
+      // โหลดข้อมูลล่าสุดจาก Google Sheet
+      const latestMembers = await loadMembers();
 
-    if (found) {
-      setMember(found);
-    } else {
-      alert("ไม่พบสมาชิก");
-      setMember(null);
+      const inputPhone = normalizePhone(phone);
+
+      const found = latestMembers.find((m) => {
+        const sheetPhone = normalizePhone(m["Phone Number"]);
+        return sheetPhone === inputPhone;
+      });
+
+      if (found) {
+        setMember(found);
+
+        setPopup({
+          show: true,
+          message: "พบสมาชิก 🎉",
+          color: "#16a34a",
+        });
+      } else {
+        setMember(null);
+
+        setPopup({
+          show: true,
+          message: "ไม่พบสมาชิก",
+          color: "#dc2626",
+        });
+      }
+
+      setTimeout(() => {
+        setPopup((prev) => ({
+          ...prev,
+          show: false,
+        }));
+      }, 2500);
+    } catch (error) {
+      console.error(error);
+
+      setPopup({
+        show: true,
+        message: "เกิดข้อผิดพลาด",
+        color: "#dc2626",
+      });
+    } finally {
+      setSearchLoading(false);
     }
   };
 
@@ -80,13 +124,12 @@ export default function App() {
     }
 
     // ✅ normalize เบอร์
-    const normalizePhone = (p) =>
-      (p || "").replace(/\D/g, "").replace(/^0/, "");
+    const normalizePhone = (p) => (p || "").replace(/\D/g, "");
 
     const inputPhone = normalizePhone(registerData.phone);
 
-    // ✅ เช็ค format เบอร์ไทย
-    if (!/^([689]\d{8}|[689]\d{9})$/.test(inputPhone)) {
+    // ✅ รองรับเบอร์ต่างประเทศ
+    if (!/^\d{7,15}$/.test(inputPhone)) {
       setPopup({
         show: true,
         message: "กรุณากรอกเบอร์โทรให้ถูกต้อง",
@@ -162,6 +205,9 @@ export default function App() {
       setMembers((prev) => [...prev, newMember]);
 
       setMember(newMember);
+
+      // ✅ ใส่เบอร์ลงช่องค้นหาอัตโนมัติ
+      setPhone(registerData.phone);
 
       setPopup({
         show: true,
@@ -276,19 +322,21 @@ export default function App() {
 
           <button
             onClick={handleSearch}
+            disabled={searchLoading}
             style={{
               width: "100%",
               marginTop: "16px",
               padding: "14px",
               borderRadius: "12px",
               border: "none",
-              background: "#111827",
+              background: searchLoading ? "#9ca3af" : "#111827",
+              cursor: searchLoading ? "not-allowed" : "pointer",
               color: "white",
               fontSize: "18px",
               cursor: "pointer",
             }}
           >
-            ค้นหาสมาชิก
+            {searchLoading ? "กำลังค้นหา..." : "ค้นหาสมาชิก"}
           </button>
 
           {/* ปุ่มสมัครสมาชิก */}
@@ -458,10 +506,32 @@ export default function App() {
             <div
               style={{
                 marginTop: "40px",
-                borderTop: "1px solid #eee",
-                paddingTop: "20px",
+                border: "1px solid #eee",
+                borderRadius: "16px",
+                padding: "24px",
+                position: "relative",
+                background: "#fafafa",
               }}
             >
+              <button
+                onClick={() => setMember(null)}
+                style={{
+                  position: "absolute",
+                  top: "20px",
+                  right: "0",
+                  width: "32px",
+                  height: "32px",
+                  borderRadius: "999px",
+                  border: "none",
+                  background: "#f3f4f6",
+                  fontSize: "18px",
+                  cursor: "pointer",
+                  color: "#111827",
+                }}
+              >
+                ✕
+              </button>
+
               <h2 style={{ color: "black" }}>{member["Crm Name"]}</h2>
 
               <p style={{ color: "black" }}>📞 {member["Phone Number"]}</p>
