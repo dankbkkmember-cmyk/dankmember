@@ -311,7 +311,7 @@ export default function App() {
             value={phone}
             onChange={(e) => setPhone(e.target.value)}
             style={{
-              width: "100%",
+              width: "95%",
               padding: "14px",
               marginTop: "8px",
               borderRadius: "12px",
@@ -376,7 +376,7 @@ export default function App() {
                   })
                 }
                 style={{
-                  width: "100%",
+                  width: "95%",
                   padding: "14px",
                   marginBottom: "10px",
                   borderRadius: "12px",
@@ -395,7 +395,7 @@ export default function App() {
                   })
                 }
                 style={{
-                  width: "100%",
+                  width: "95%",
                   padding: "14px",
                   marginBottom: "10px",
                   borderRadius: "12px",
@@ -435,7 +435,7 @@ export default function App() {
                   })
                 }
                 style={{
-                  width: "100%",
+                  width: "95%",
                   padding: "14px",
                   marginBottom: "10px",
                   borderRadius: "12px",
@@ -467,15 +467,38 @@ export default function App() {
 
               <input
                 type="date"
+                placeholder="BIRTHDAY"
+                max={new Date().toISOString().split("T")[0]}
                 value={registerData.birthdate}
-                onChange={(e) =>
+                onChange={(e) => {
+                  const birthdate = e.target.value;
+
+                  // คำนวณอายุ
+                  const today = new Date();
+                  const birth = new Date(birthdate);
+
+                  let age = today.getFullYear() - birth.getFullYear();
+                  const monthDiff = today.getMonth() - birth.getMonth();
+
+                  if (
+                    monthDiff < 0 ||
+                    (monthDiff === 0 && today.getDate() < birth.getDate())
+                  ) {
+                    age--;
+                  }
+
+                  // แจ้งเตือนถ้าอายุน้อยกว่า 20
+                  if (age < 20) {
+                    alert("อายุไม่ถึงเกณฑ์ (20 ปีขึ้นไป)");
+                  }
+
                   setRegisterData({
                     ...registerData,
-                    birthdate: e.target.value,
-                  })
-                }
+                    birthdate,
+                  });
+                }}
                 style={{
-                  width: "100%",
+                  width: "95%",
                   padding: "14px",
                   marginBottom: "10px",
                   borderRadius: "12px",
