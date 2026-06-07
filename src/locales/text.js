@@ -13,6 +13,9 @@ const text = {
     birthday: "วันเกิด",
     notFound: "ไม่พบสมาชิก",
     found: "พบสมาชิก 🎉",
+    successfully: "สมัครสมาชิกสำเร็จ 🎉",
+    review: "รีวิว Google Maps รับฟรี 1 Joint 🌿",
+    scan: "สแกน QR Code เพื่อรีวิวร้านบน Google Maps",
   },
 
   en: {
@@ -29,6 +32,9 @@ const text = {
     birthday: "Birthday",
     notFound: "Member Not Found",
     found: "Member Found 🎉",
+    successfully: "Successfully applied for membership 🎉",
+    review: "Review Google Maps and get 1 Joint for free 🌿🌿",
+    scan: "Scan the QR code to review the restaurant on Google Maps.",
   },
 };
 

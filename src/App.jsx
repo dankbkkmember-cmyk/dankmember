@@ -3,13 +3,15 @@ import Papa from "papaparse";
 import hero from "./assets/LOGO.JPG";
 import text from "./locales/text";
 import LanguageSwitcher from "./components/LanguageSwitcher";
+import SuccessModal from "./components/SuccessModal";
 
 export default function App() {
   const [phone, setPhone] = useState("");
   const [member, setMember] = useState(null);
   const [members, setMembers] = useState([]);
   const [lang, setLang] = useState("th");
-  const t = text[lang];
+  const t = text[lang] || text.th;
+  const [showSuccessModal, setShowSuccessModal] = useState(false);
   console.log(members);
   // register states
   const [showRegister, setShowRegister] = useState(false);
@@ -213,11 +215,7 @@ export default function App() {
       // ✅ ใส่เบอร์ลงช่องค้นหาอัตโนมัติ
       setPhone(registerData.phone);
 
-      setPopup({
-        show: true,
-        message: "สมัครสมาชิกสำเร็จ 🎉",
-        color: "#16a34a",
-      });
+      setShowSuccessModal(true);
 
       setShowRegister(false);
 
@@ -525,7 +523,7 @@ export default function App() {
                   cursor: loading ? "not-allowed" : "pointer",
                 }}
               >
-                {searchLoading ? t.registering : t.confirmRegister}
+                {loading ? t.registering : t.confirmRegister}
               </button>
             </div>
           )}
@@ -578,6 +576,11 @@ export default function App() {
           )}
         </div>
       </div>
+      <SuccessModal
+        show={showSuccessModal}
+        onClose={() => setShowSuccessModal(false)}
+        lang={lang}
+      />
     </div>
   );
 }
