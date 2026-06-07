@@ -1,11 +1,15 @@
 import { useEffect, useState } from "react";
 import Papa from "papaparse";
 import hero from "./assets/LOGO.JPG";
+import text from "./locales/text";
+import LanguageSwitcher from "./components/LanguageSwitcher";
 
 export default function App() {
   const [phone, setPhone] = useState("");
   const [member, setMember] = useState(null);
   const [members, setMembers] = useState([]);
+  const [lang, setLang] = useState("th");
+  const t = text[lang];
   console.log(members);
   // register states
   const [showRegister, setShowRegister] = useState(false);
@@ -73,7 +77,7 @@ export default function App() {
 
         setPopup({
           show: true,
-          message: "พบสมาชิก 🎉",
+          message: t.found,
           color: "#16a34a",
         });
       } else {
@@ -81,7 +85,7 @@ export default function App() {
 
         setPopup({
           show: true,
-          message: "ไม่พบสมาชิก",
+          message: t.notFound,
           color: "#dc2626",
         });
       }
@@ -268,6 +272,7 @@ export default function App() {
         }}
       >
         <div style={{ textAlign: "center" }}>
+          <LanguageSwitcher lang={lang} setLang={setLang} />
           <img
             src={hero}
             alt=""
@@ -303,7 +308,7 @@ export default function App() {
             </div>
           )}
 
-          <label>เบอร์โทรศัพท์ / Phone Number</label>
+          <label>{t.phone}</label>
 
           <input
             type="text"
@@ -336,7 +341,7 @@ export default function App() {
               cursor: "pointer",
             }}
           >
-            {searchLoading ? "กำลังค้นหา..." : "ค้นหาสมาชิก"}
+            {searchLoading ? t.searching : t.search}
           </button>
 
           {/* ปุ่มสมัครสมาชิก */}
@@ -354,7 +359,7 @@ export default function App() {
               cursor: "pointer",
             }}
           >
-            สมัครสมาชิก
+            {t.register}
           </button>
 
           {/* ฟอร์มสมัคร */}
@@ -367,7 +372,7 @@ export default function App() {
             >
               <input
                 type="text"
-                placeholder="Name"
+                placeholder={t.name}
                 value={registerData.name}
                 onChange={(e) =>
                   setRegisterData({
@@ -386,7 +391,7 @@ export default function App() {
 
               <input
                 type="text"
-                placeholder="Phone Number"
+                placeholder={t.phone}
                 value={registerData.phone}
                 onChange={(e) =>
                   setRegisterData({
@@ -426,7 +431,7 @@ export default function App() {
 
               <input
                 type="email"
-                placeholder="Email (optional)"
+                placeholder={t.email}
                 value={registerData.email}
                 onChange={(e) =>
                   setRegisterData({
@@ -459,7 +464,7 @@ export default function App() {
                   border: "1px solid #ddd",
                 }}
               >
-                <option value="">Gender</option>
+                <option value="">{t.gender}</option>
                 <option value="Male">Male</option>
                 <option value="Female">Female</option>
                 <option value="Other">Other</option>
@@ -467,7 +472,7 @@ export default function App() {
 
               <input
                 type="date"
-                placeholder="BIRTHDAY"
+                placeholder={t.birthday}
                 max={new Date().toISOString().split("T")[0]}
                 value={registerData.birthdate}
                 onChange={(e) => {
@@ -520,7 +525,7 @@ export default function App() {
                   cursor: loading ? "not-allowed" : "pointer",
                 }}
               >
-                {loading ? "กำลังสมัคร..." : "ยืนยันสมัครสมาชิก"}
+                {searchLoading ? t.registering : t.confirmRegister}
               </button>
             </div>
           )}
